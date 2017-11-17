@@ -153,24 +153,20 @@ def draw_page():
         top = padding
         bottom = height-padding
         # Move left to right keeping track of the current x position for drawing shapes.
+	# Get the nano's ip and the wan ip.  Then run an iperf test.
         x = 0
-	IPAddress = get_ip()
-        cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-        CPU = subprocess.check_output(cmd, shell = True )
-        cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
-        MemUsage = subprocess.check_output(cmd, shell = True )
-        cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
-        Disk = subprocess.check_output(cmd, shell = True )
-        tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
-        if tempI>1000:
-            tempI = tempI/1000
-        tempStr = "CPU TEMP: %sC" % str(tempI)
-
-        draw.text((x, top+5),       "IP: " + str(IPAddress),  font=smartFont, fill=255)
-        draw.text((x, top+5+12),    str(CPU), font=smartFont, fill=255)
-        draw.text((x, top+5+24),    str(MemUsage),  font=smartFont, fill=255)
-        draw.text((x, top+5+36),    str(Disk),  font=smartFont, fill=255)
-        draw.text((x, top+5+48),    tempStr,  font=smartFont, fill=255)
+        IP = get_ip()
+        cmd = "dig +short myip.opendns.com @resolver1.opendns.com"
+        WANIP = subprocess.check_output(cmd, shell = True )
+        cmd = "iperf3 -c 207.34.75.194 -R -P 4 -t 20 | awk '$NF==\"sender\" {pr$
+        Download = subprocess.check_output(cmd, shell = True )
+        cmd = "iperf3 -c 207.34.75.194 | awk '$NF==\"sender\" {print \"Up:\",$7$
+        Upload = subprocess.check_output(cmd, shell = True )
+	# Now draw the IP and upload and download. Figure out how to display loading screen while iperf runs.
+        draw.text((x, top+2),       "W IP: " + str(WANIP),  font=smartFont, fil$
+        draw.text((x, top+10),       "L IP: " + str(IP),  font=smartFont, fill=$
+        draw.text((x, top+5+20),     str(Download), font=font11, fill=255)
+        draw.text((x, top+5+36),    str(Upload),  font=font11, fill=255)
     elif page_index==3: #shutdown -- no
         draw.text((2, 2),  'Shutdown?',  font=fontb14, fill=255)
 
@@ -261,8 +257,9 @@ def receive_signal(signum, stack):
             update_page_index(3)
             draw_page()
 
-
-image0 = Image.open('friendllyelec.png').convert('1')
+#lets replace the friendllyelec logo with the TELUS logo.
+#image0 = Image.open('friendllyelec.png').convert('1')
+image0 = Image.open('teluslogo.png').convert('1')
 oled.drawImage(image0)
 time.sleep(2)
 
