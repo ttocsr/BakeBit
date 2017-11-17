@@ -158,9 +158,9 @@ def draw_page():
         IP = get_ip()
         cmd = "dig +short myip.opendns.com @resolver1.opendns.com"
         WANIP = subprocess.check_output(cmd, shell = True )
-        cmd = "iperf3 -c 207.34.75.194 -R -P 4 -t 20 | awk '$NF==\"sender\" {print \"Download:\",$7+\"Mbs\"; exit}'"
+        cmd = "iperf3 -c 207.34.75.194 -R -P 4 -t 20 | awk '$NF==\"sender\" {print \"Down:\",$7,\"Mb/s\"; exit}'"
         Download = subprocess.check_output(cmd, shell = True )
-        cmd = "iperf3 -c 207.34.75.194 | awk '$NF==\"sender\" {print \"Up:\",$7+\"Mbs\"; exit}'"
+        cmd = "iperf3 -c 207.34.75.194 | awk '$NF==\"sender\" {print \"Up:\",$7,\"Mb/s\"; exit}'"
         Upload = subprocess.check_output(cmd, shell = True )
 	# Now draw the IP and upload and download. Figure out how to display loading screen while iperf runs.
         draw.text((x, top+2),       "W IP: " + str(WANIP),  font=smartFont, fill=255)
